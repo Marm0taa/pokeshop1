@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}PokéShop TCG — Inicio{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">⚡ Trading Card Game Store</p>
+    <h1 class="hero-title">Colecciona.<br><span class="gradient-text">Juega. Gana.</span></h1>
+    <p class="hero-sub">Las mejores cartas Pokémon originales. Raras, holográficas y sets completos disponibles.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('catalog') }}" class="btn-primary">Ver catálogo →</a>
+      {% if not user %}
+        <a href="{{ url_for('register') }}" class="btn-ghost">Crear cuenta gratis</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="hero-cards">
+    <div class="floating-card card-1">✨</div>
+    <div class="floating-card card-2">🔥</div>
+    <div class="floating-card card-3">💧</div>
+    <div class="floating-card card-4">⚡</div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🃏</div>
+        <h3>Cartas Originales</h3>
+        <p>Solo cartas auténticas de todos los sets. Singles, packs y colecciones raras.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <h3>Envío Rápido</h3>
+        <p>Delivery a todo Lima en 24h. Empaque especial para proteger tus cartas.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Pago Seguro</h3>
+        <p>Aceeptamos Yape, Plin y tarjetas. Tu transacción 100% protegida.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h3>Cartas PSA</h3>
+        <p>Selección de cartas calificadas PSA y BGS para el coleccionista serio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

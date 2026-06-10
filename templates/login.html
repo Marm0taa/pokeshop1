@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar sesión — PokéShop TCG{% endblock %}
+{% block content %}
+
+<section class="auth-section">
+  <div class="auth-card">
+    <div class="auth-logo">⚡</div>
+    <h1>Bienvenido de vuelta</h1>
+    <p class="auth-sub">Ingresa a tu cuenta para continuar</p>
+
+    <form method="POST" class="auth-form">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" name="username" placeholder="Tu nombre de usuario" required>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" placeholder="Tu contraseña" required>
+      </div>
+      <button type="submit" class="btn-primary full-width">Iniciar sesión →</button>
+    </form>
+
+    <p class="auth-switch">¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate gratis</a></p>
+  </div>
+</section>
+
+{% endblock %}

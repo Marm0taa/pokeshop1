@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Checkout — PokéShop TCG{% endblock %}
+{% block content %}
+
+<section class="checkout-section">
+  <div class="container">
+    <h1>Confirmar pedido</h1>
+    <div class="checkout-grid">
+
+      <!-- RESUMEN -->
+      <div class="checkout-summary">
+        <h2>Resumen</h2>
+        {% for item in cart %}
+        <div class="checkout-item">
+          <img src="{{ item.image }}" alt="{{ item.name }}" class="checkout-card-img">
+          <div class="checkout-item-info">
+            <strong>{{ item.name }}</strong>
+            <span>S/ {{ item.price }}.00 × {{ item.qty }}</span>
+          </div>
+          <span class="checkout-item-total">S/ {{ (item.price | float * item.qty) | round(2) }}</span>
+        </div>
+        {% endfor %}
+        <div class="checkout-total-row">
+          <span>Total</span>
+          <strong>S/ {{ total }}</strong>
+        </div>
+      </div>
+
+      <!-- FORMULARIO -->
+      <div class="checkout-form-wrap">
+        <h2>Datos de entrega</h2>
+        <form method="POST" class="auth-form">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" placeholder="Ej: Ash Ketchum" required>
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" placeholder="Av. Palermo 123, Lima" required>
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" placeholder="9XXXXXXXX" required>
+          </div>
+          <div class="form-group">
+            <label>Método de pago</label>
+            <select required class="select-input">
+              <option value="">Selecciona...</option>
+              <option>Yape</option>
+              <option>Plin</option>
+              <option>Tarjeta de débito</option>
+              <option>Tarjeta de crédito</option>
+              <option>Efectivo contra entrega</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary full-width">✅ Confirmar pedido — S/ {{ total }}</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

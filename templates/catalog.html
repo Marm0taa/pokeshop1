@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Catálogo — PokéShop TCG{% endblock %}
+{% block content %}
+
+<section class="catalog-section">
+  <div class="container">
+    <div class="catalog-header">
+      <h1>Catálogo de Cartas</h1>
+      <p>Explora nuestra colección. Haz clic en una carta para añadirla al carrito.</p>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="🔍 Buscar carta..." class="search-input" oninput="filterCards()">
+      <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterByType('all', this)">Todos</button>
+        <button class="filter-btn" onclick="filterByType('fire', this)">🔥 Fuego</button>
+        <button class="filter-btn" onclick="filterByType('water', this)">💧 Agua</button>
+        <button class="filter-btn" onclick="filterByType('lightning', this)">⚡ Eléctrico</button>
+        <button class="filter-btn" onclick="filterByType('grass', this)">🌿 Planta</button>
+        <button class="filter-btn" onclick="filterByType('psychic', this)">🔮 Psíquico</button>
+        <button class="filter-btn" onclick="filterByType('dragon', this)">🐉 Dragón</button>
+      </div>
+    </div>
+
+    <!-- GRID DE CARTAS -->
+    <div id="loadingState" class="loading-state">
+      <div class="pokeball-spin">⚪</div>
+      <p>Cargando cartas...</p>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+    <div id="emptyState" class="empty-state" style="display:none">
+      <p>No se encontraron cartas. Intenta otra búsqueda.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allCards = [];
+let activeType = 'all';
+
+// Precios aleatorios pero coherentes según rareza
+function getPrice(rarity) {
+  const prices = {
+    'Common': [5, 8, 10],
+    'Uncommon': [12, 15, 20],
+    'Rare': [25, 35, 45],
+    'Rare Holo': [50, 65, 80],
+    'Rare Ultra': [90, 120, 150],
+    'Rare Secret': [180, 220, 280],
+    'Amazing Rare': [75, 95, 110],
+    'LEGEND': [200, 250, 300],
+  };
+  const opts = prices[rarity] || [15, 20, 25];
+  return opts[Math.floor(Math.random() * opts.length)];
+}
+
+async function loadCards(type = '') {
+  document.getElementById('loadingState').style.display = 'flex';
+  document.getElementById('cardsGrid').innerHTML = '';
+  document.getElementById('emptyState').style.display = 'none';
+
+  let query = 'supertype:Pokémon';
+  if (type && type !== 'all') query += ` types:${type}`;
+
+  const url = `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(query)}&pageSize=24&orderBy=-set.releaseDate`;
+
+  try {
+    const res  = await fetch(url, { headers: { 'X-Api-Key': '' } });
+    const data = await res.json();
+    allCards = (data.data || []).map(card => ({
+      id:     card.id,
+      name:   card.name,
+      image:  card.images?.small || '',
+      rarity: card.rarity || 'Common',
+      types:  card.types || [],
+      set:    card.set?.name || '',
+      price:  getPrice(card.rarity || 'Common'),
+    }));
+    renderCards(allCards);
+  } catch(e) {
+    document.getElementById('loadingState').innerHTML = '<p style="color:var(--accent-red)">Error al cargar cartas. Verifica tu conexión.</p>';
+  }
+}
+
+function renderCards(cards) {
+  document.getElementById('loadingState').style.display = 'none';
+  const grid = document.getElementById('cardsGrid');
+  if (!cards.length) {
+    document.getElementById('emptyState').style.display = 'block';
+    return;
+  }
+  grid.innerHTML = cards.map(card => `
+    <div class="card-item" data-type="${(card.types[0]||'').toLowerCase()}" data-name="${card.name.toLowerCase()}">
+      <div class="card-img-wrap">
+        <img src="${card.image}" alt="${card.name}" loading="lazy" class="card-img">
+        <div class="card-overlay">
+          <button class="btn-add-cart" onclick='addToCart(${JSON.stringify(card)})'>+ Añadir al carrito</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="card-name">${card.name}</h3>
+        <p class="card-set">${card.set}</p>
+        <div class="card-footer">
+          <span class="card-rarity rarity-${(card.rarity||'').toLowerCase().replace(/ /g,'-')}">${card.rarity||'—'}</span>
+          <span class="card-price">S/ ${card.price}.00</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allCards.filter(c => {
+    const matchName = c.name.toLowerCase().includes(q);
+    const matchType = activeType === 'all' || (c.types[0]||'').toLowerCase() === activeType;
+    return matchName && matchType;
+  });
+  renderCards(filtered);
+}
+
+function filterByType(type, btn) {
+  activeType = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
+
+async function addToCart(card) {
+  const res = await fetch('/api/cart/add', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(card)
+  });
+  const data = await res.json();
+  if (data.ok) {
+    updateCartCount(data.count);
+    showToast(`${card.name} añadido al carrito ⚡`);
+  }
+}
+
+loadCards();
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Pedido confirmado — PokéShop TCG{% endblock %}
+{% block content %}
+
+<section class="success-section">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h1>¡Pedido confirmado!</h1>
+    <p>Gracias por tu compra. Tu pedido está siendo procesado y te llegará pronto.</p>
+    <div class="success-actions">
+      <a href="{{ url_for('catalog') }}" class="btn-primary">Seguir comprando →</a>
+      <a href="{{ url_for('index') }}" class="btn-ghost">Ir al inicio</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
